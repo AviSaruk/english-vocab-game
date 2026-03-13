@@ -467,6 +467,21 @@
             cursor: default;
         }
 
+        .quiz-unsure.know-it {
+            color: #38ef7d;
+            border-color: #38ef7d;
+        }
+
+        .quiz-unsure.know-it:hover {
+            background: #38ef7d;
+            color: white;
+        }
+
+        .quiz-unsure.know-it.added {
+            background: #38ef7d;
+            color: white;
+        }
+
         .quiz-buttons {
             display: flex;
             justify-content: center;
@@ -2019,26 +2034,29 @@
 
             const unsureBtn = document.getElementById('quizUnsure');
             unsureBtn.classList.remove('added');
-            unsureBtn.textContent = 'לא הייתי בטוח במילה הזאת';
+
+            // Different button text and style based on quiz type
+            if (quizBlacklistOnly) {
+                unsureBtn.textContent = 'עכשיו אני יודע!';
+                unsureBtn.classList.add('know-it');
+            } else {
+                unsureBtn.textContent = 'לא הייתי בטוח במילה הזאת';
+                unsureBtn.classList.remove('know-it');
+            }
 
             if (selected === correct) {
                 if (isFirstAttempt) {
                     quizScore++;
                     modeData.stats.correctAnswers++;
-                    // Add to mastered words
+                    // Add to mastered words (but don't auto-remove from blacklist)
                     if (!modeData.masteredWords) {
                         modeData.masteredWords = [];
-                    }
-                    // If in blacklist quiz and answered correctly, remove from blacklist
-                    if (quizBlacklistOnly && isBlacklisted(word.en)) {
-                        removeFromBlacklist(word.en);
-                        addToHistory('removed_from_blacklist', `הוסר מהרשימה השחורה: ${word.en}`);
                     }
                     if (!modeData.masteredWords.includes(word.en)) {
                         modeData.masteredWords.push(word.en);
                     }
                 }
-                // Show "not sure" button only on correct answer
+                // Show button only on correct answer
                 unsureBtn.classList.remove('hidden');
             } else {
                 if (isFirstAttempt) {
@@ -2059,20 +2077,37 @@
         }
 
         function markAsUnsure() {
-            if (currentQuizWord && !isBlacklisted(currentQuizWord.en)) {
-                addToBlacklist(currentQuizWord);
-                addToHistory('marked_unsure', `סימן כלא בטוח: ${currentQuizWord.en} (${currentQuizWord.he})`);
-                // Remove from mastered
-                const modeData = getModeData();
-                if (modeData.masteredWords) {
-                    modeData.masteredWords = modeData.masteredWords.filter(w => w !== currentQuizWord.en);
-                }
-                saveUserData(currentUser);
-                updateUserStatsMini();
+            if (!currentQuizWord) return;
 
-                const unsureBtn = document.getElementById('quizUnsure');
-                unsureBtn.classList.add('added');
-                unsureBtn.textContent = 'נוסף לרשימה השחורה';
+            const unsureBtn = document.getElementById('quizUnsure');
+            const modeData = getModeData();
+
+            if (quizBlacklistOnly) {
+                // In blacklist quiz: "Now I know!" removes from blacklist
+                if (isBlacklisted(currentQuizWord.en)) {
+                    removeFromBlacklist(currentQuizWord.en);
+                    addToHistory('removed_from_blacklist', `הוסר מהרשימה השחורה: ${currentQuizWord.en}`);
+                    saveUserData(currentUser);
+                    updateUserStatsMini();
+
+                    unsureBtn.classList.add('added');
+                    unsureBtn.textContent = 'הוסר מהרשימה השחורה!';
+                }
+            } else {
+                // In regular quiz: "Not sure" adds to blacklist
+                if (!isBlacklisted(currentQuizWord.en)) {
+                    addToBlacklist(currentQuizWord);
+                    addToHistory('marked_unsure', `סימן כלא בטוח: ${currentQuizWord.en} (${currentQuizWord.he})`);
+                    // Remove from mastered
+                    if (modeData.masteredWords) {
+                        modeData.masteredWords = modeData.masteredWords.filter(w => w !== currentQuizWord.en);
+                    }
+                    saveUserData(currentUser);
+                    updateUserStatsMini();
+
+                    unsureBtn.classList.add('added');
+                    unsureBtn.textContent = 'נוסף לרשימה השחורה';
+                }
             }
         }
 
