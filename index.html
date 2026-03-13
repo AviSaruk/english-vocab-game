@@ -36,6 +36,127 @@
             font-size: 1.1em;
         }
 
+        /* Login Screen */
+        .login-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            margin: 50px auto;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .login-screen h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .login-screen input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .login-screen input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .existing-users {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .existing-users h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .user-chip {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #f0f0ff;
+            border-radius: 20px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-chip:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* User Header */
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .user-info {
+            color: white;
+        }
+
+        .user-info .username {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .user-info .stats-mini {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-action-btn {
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .user-action-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
         .tabs {
             display: flex;
             justify-content: center;
@@ -64,6 +185,15 @@
             background: white;
             color: #667eea;
             font-weight: bold;
+        }
+
+        .tab-btn.blacklist-tab {
+            background: rgba(255,100,100,0.3);
+        }
+
+        .tab-btn.blacklist-tab.active {
+            background: #ff6b6b;
+            color: white;
         }
 
         .search-box {
@@ -110,6 +240,27 @@
 
         .word-card.revealed {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .word-card.blacklisted {
+            border: 3px solid #ff6b6b;
+        }
+
+        .word-card.blacklisted::after {
+            content: '!';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff6b6b;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
         }
 
         .english-word {
@@ -256,6 +407,121 @@
             background: #764ba2;
         }
 
+        /* History Panel */
+        .history-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .history-panel h2 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item .date {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .history-item .action {
+            color: #333;
+        }
+
+        .history-item .result {
+            font-weight: bold;
+        }
+
+        .history-item .result.good {
+            color: #38ef7d;
+        }
+
+        .history-item .result.bad {
+            color: #ff6b6b;
+        }
+
+        /* Blacklist Section */
+        .blacklist-info {
+            background: rgba(255,107,107,0.1);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .blacklist-info h3 {
+            margin: 0 0 10px 0;
+        }
+
+        .blacklist-info p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .clear-blacklist-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .empty-blacklist {
+            text-align: center;
+            color: white;
+            padding: 50px;
+            font-size: 1.2em;
+        }
+
         @media (max-width: 600px) {
             .words-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -269,42 +535,83 @@
             .english-word {
                 font-size: 1em;
             }
+
+            .user-header {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>לומדת אוצר מילים באנגלית</h1>
-        <p class="instructions">לחצו על מילה כדי לראות את התרגום ולשמוע את ההגייה</p>
-
-        <div class="tabs">
-            <button class="tab-btn active" data-list="all">הכל</button>
-            <button class="tab-btn" data-list="LISTA">רשימה A</button>
-            <button class="tab-btn" data-list="LISTB">רשימה B</button>
-            <button class="tab-btn" data-list="LISTC">רשימה C</button>
-            <button class="tab-btn" data-list="LISTD">רשימה D</button>
-            <button class="tab-btn" data-list="quiz">מבחן</button>
+        <!-- Login Screen -->
+        <div class="login-screen" id="loginScreen">
+            <h2>ברוכים הבאים!</h2>
+            <p>הזינו שם משתמש כדי להתחיל</p>
+            <input type="text" id="usernameInput" placeholder="שם משתמש..." maxlength="20">
+            <button class="login-btn" id="loginBtn">התחל ללמוד</button>
+            <div class="existing-users" id="existingUsers"></div>
         </div>
 
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="חפש מילה...">
-        </div>
+        <!-- Main App -->
+        <div id="mainApp" class="hidden">
+            <h1>לומדת אוצר מילים באנגלית</h1>
 
-        <div class="controls">
-            <button class="control-btn" id="revealAll">הצג הכל</button>
-            <button class="control-btn" id="hideAll">הסתר הכל</button>
-            <button class="control-btn" id="shuffle">ערבב</button>
-        </div>
+            <div class="user-header">
+                <div class="user-info">
+                    <div class="username" id="currentUsername"></div>
+                    <div class="stats-mini" id="userStatsMini"></div>
+                </div>
+                <div class="user-actions">
+                    <button class="user-action-btn" id="historyBtn">היסטוריה</button>
+                    <button class="user-action-btn" id="logoutBtn">החלף משתמש</button>
+                </div>
+            </div>
 
-        <div class="stats" id="stats"></div>
+            <p class="instructions">לחצו על מילה כדי לראות את התרגום ולשמוע את ההגייה</p>
 
-        <div class="words-grid" id="wordsGrid"></div>
+            <div class="tabs">
+                <button class="tab-btn active" data-list="all">הכל</button>
+                <button class="tab-btn" data-list="LISTA">רשימה A</button>
+                <button class="tab-btn" data-list="LISTB">רשימה B</button>
+                <button class="tab-btn" data-list="LISTC">רשימה C</button>
+                <button class="tab-btn" data-list="LISTD">רשימה D</button>
+                <button class="tab-btn blacklist-tab" data-list="blacklist">רשימה שחורה</button>
+                <button class="tab-btn" data-list="quiz">מבחן</button>
+            </div>
 
-        <div class="quiz-mode hidden" id="quizMode">
-            <div class="quiz-score" id="quizScore">ניקוד: 0/0</div>
-            <div class="quiz-word" id="quizWord"></div>
-            <div class="quiz-options" id="quizOptions"></div>
-            <button class="quiz-next hidden" id="quizNext">המילה הבאה</button>
+            <div class="search-box" id="searchBox">
+                <input type="text" id="searchInput" placeholder="חפש מילה...">
+            </div>
+
+            <div class="controls" id="controls">
+                <button class="control-btn" id="revealAll">הצג הכל</button>
+                <button class="control-btn" id="hideAll">הסתר הכל</button>
+                <button class="control-btn" id="shuffle">ערבב</button>
+            </div>
+
+            <div class="stats" id="stats"></div>
+
+            <div class="words-grid" id="wordsGrid"></div>
+
+            <div class="quiz-mode hidden" id="quizMode">
+                <div class="quiz-score" id="quizScore">ניקוד: 0/0</div>
+                <div class="quiz-word" id="quizWord"></div>
+                <div class="quiz-options" id="quizOptions"></div>
+                <button class="quiz-next hidden" id="quizNext">המילה הבאה</button>
+                <button class="quiz-next" id="quizExit" style="background: #999; margin-right: 10px;">יציאה מהמבחן</button>
+            </div>
+
+            <div class="history-panel hidden" id="historyPanel">
+                <h2>ההיסטוריה שלי</h2>
+                <div class="history-stats" id="historyStats"></div>
+                <h3>פעילות אחרונה</h3>
+                <div class="history-list" id="historyList"></div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="control-btn" id="closeHistory" style="border-color: #667eea; color: #667eea;">חזור</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1201,12 +1508,137 @@
             ]
         };
 
+        // User management
+        let currentUser = null;
+
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('vocabUsers') || '[]');
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('vocabUsers', JSON.stringify(users));
+        }
+
+        function getUserData(username) {
+            const data = localStorage.getItem(`vocabUser_${username}`);
+            return data ? JSON.parse(data) : {
+                username: username,
+                createdAt: new Date().toISOString(),
+                blacklist: [],
+                history: [],
+                stats: {
+                    totalQuizzes: 0,
+                    correctAnswers: 0,
+                    totalAnswers: 0,
+                    wordsLearned: 0
+                }
+            };
+        }
+
+        function saveUserData(userData) {
+            localStorage.setItem(`vocabUser_${userData.username}`, JSON.stringify(userData));
+        }
+
+        function login(username) {
+            username = username.trim();
+            if (!username) return;
+
+            let users = getUsers();
+            if (!users.includes(username)) {
+                users.push(username);
+                saveUsers(users);
+            }
+
+            currentUser = getUserData(username);
+            currentUser.lastLogin = new Date().toISOString();
+            saveUserData(currentUser);
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('currentUsername').textContent = currentUser.username;
+            updateUserStatsMini();
+            renderWords(getAllWords());
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('usernameInput').value = '';
+            showExistingUsers();
+        }
+
+        function showExistingUsers() {
+            const users = getUsers();
+            const container = document.getElementById('existingUsers');
+
+            if (users.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = '<h3>משתמשים קיימים:</h3>';
+            users.forEach(user => {
+                const chip = document.createElement('span');
+                chip.className = 'user-chip';
+                chip.textContent = user;
+                chip.addEventListener('click', () => login(user));
+                container.appendChild(chip);
+            });
+        }
+
+        function updateUserStatsMini() {
+            const stats = currentUser.stats;
+            const accuracy = stats.totalAnswers > 0
+                ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100)
+                : 0;
+            document.getElementById('userStatsMini').textContent =
+                `מבחנים: ${stats.totalQuizzes} | דיוק: ${accuracy}% | ברשימה שחורה: ${currentUser.blacklist.length}`;
+        }
+
+        function addToHistory(action, details) {
+            currentUser.history.unshift({
+                date: new Date().toISOString(),
+                action: action,
+                details: details
+            });
+            // Keep only last 100 entries
+            currentUser.history = currentUser.history.slice(0, 100);
+            saveUserData(currentUser);
+        }
+
+        function addToBlacklist(word) {
+            if (!currentUser.blacklist.find(w => w.en === word.en)) {
+                currentUser.blacklist.push({
+                    en: word.en,
+                    he: word.he,
+                    addedAt: new Date().toISOString(),
+                    failCount: 1
+                });
+                saveUserData(currentUser);
+            } else {
+                const existing = currentUser.blacklist.find(w => w.en === word.en);
+                existing.failCount++;
+                saveUserData(currentUser);
+            }
+        }
+
+        function removeFromBlacklist(wordEn) {
+            currentUser.blacklist = currentUser.blacklist.filter(w => w.en !== wordEn);
+            saveUserData(currentUser);
+        }
+
+        function isBlacklisted(wordEn) {
+            return currentUser && currentUser.blacklist.some(w => w.en === wordEn);
+        }
+
+        // Word functions
         let currentList = 'all';
-        let allWords = [];
         let quizWords = [];
         let quizIndex = 0;
         let quizScore = 0;
         let quizTotal = 0;
+        let quizFirstAttempts = {};
 
         function getAllWords() {
             let words = [];
@@ -1229,9 +1661,18 @@
             const grid = document.getElementById('wordsGrid');
             grid.innerHTML = '';
 
-            words.forEach((word, index) => {
+            if (currentList === 'blacklist' && words.length === 0) {
+                grid.innerHTML = '<div class="empty-blacklist">אין מילים ברשימה השחורה! כל הכבוד!</div>';
+                document.getElementById('stats').textContent = '';
+                return;
+            }
+
+            words.forEach((word) => {
                 const card = document.createElement('div');
                 card.className = 'word-card';
+                if (isBlacklisted(word.en)) {
+                    card.classList.add('blacklisted');
+                }
                 card.innerHTML = `
                     <span class="speaker-icon">🔊</span>
                     <div class="english-word">${word.en}</div>
@@ -1251,7 +1692,15 @@
 
         function filterWords() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            let words = currentList === 'all' ? getAllWords() : vocabulary[currentList];
+            let words;
+
+            if (currentList === 'blacklist') {
+                words = currentUser.blacklist.map(w => ({en: w.en, he: w.he, list: 'blacklist'}));
+            } else if (currentList === 'all') {
+                words = getAllWords();
+            } else {
+                words = vocabulary[currentList].map(w => ({...w, list: currentList}));
+            }
 
             if (searchTerm) {
                 words = words.filter(w =>
@@ -1276,10 +1725,16 @@
             quizIndex = 0;
             quizScore = 0;
             quizTotal = 0;
+            quizFirstAttempts = {};
+
+            currentUser.stats.totalQuizzes++;
+            saveUserData(currentUser);
+            addToHistory('quiz_start', 'התחיל מבחן חדש');
+
             document.getElementById('wordsGrid').classList.add('hidden');
             document.getElementById('quizMode').classList.remove('hidden');
-            document.querySelector('.search-box').classList.add('hidden');
-            document.querySelector('.controls').classList.add('hidden');
+            document.getElementById('searchBox').classList.add('hidden');
+            document.getElementById('controls').classList.add('hidden');
             document.getElementById('stats').classList.add('hidden');
             showQuizQuestion();
         }
@@ -1296,7 +1751,6 @@
 
             speak(word.en);
 
-            // Get wrong answers
             let wrongAnswers = getAllWords()
                 .filter(w => w.he !== word.he)
                 .sort(() => Math.random() - 0.5)
@@ -1312,15 +1766,23 @@
                 const btn = document.createElement('div');
                 btn.className = 'quiz-option';
                 btn.textContent = option;
-                btn.addEventListener('click', () => checkAnswer(option, word.he));
+                btn.addEventListener('click', () => checkAnswer(option, word));
                 optionsDiv.appendChild(btn);
             });
 
             document.getElementById('quizNext').classList.add('hidden');
         }
 
-        function checkAnswer(selected, correct) {
-            quizTotal++;
+        function checkAnswer(selected, word) {
+            const correct = word.he;
+            const isFirstAttempt = !quizFirstAttempts[word.en];
+
+            if (isFirstAttempt) {
+                quizFirstAttempts[word.en] = true;
+                quizTotal++;
+                currentUser.stats.totalAnswers++;
+            }
+
             const options = document.querySelectorAll('.quiz-option');
 
             options.forEach(opt => {
@@ -1333,18 +1795,30 @@
             });
 
             if (selected === correct) {
-                quizScore++;
+                if (isFirstAttempt) {
+                    quizScore++;
+                    currentUser.stats.correctAnswers++;
+                }
+            } else {
+                if (isFirstAttempt) {
+                    addToBlacklist(word);
+                    addToHistory('wrong_answer', `טעה במילה: ${word.en} (${word.he})`);
+                }
             }
 
+            saveUserData(currentUser);
+            updateUserStatsMini();
             document.getElementById('quizScore').textContent = `ניקוד: ${quizScore}/${quizTotal}`;
             document.getElementById('quizNext').classList.remove('hidden');
         }
 
         function exitQuiz() {
+            addToHistory('quiz_end', `סיים מבחן - ניקוד: ${quizScore}/${quizTotal}`);
+
             document.getElementById('wordsGrid').classList.remove('hidden');
             document.getElementById('quizMode').classList.add('hidden');
-            document.querySelector('.search-box').classList.remove('hidden');
-            document.querySelector('.controls').classList.remove('hidden');
+            document.getElementById('searchBox').classList.remove('hidden');
+            document.getElementById('controls').classList.remove('hidden');
             document.getElementById('stats').classList.remove('hidden');
             currentList = 'all';
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1353,7 +1827,85 @@
             renderWords(getAllWords());
         }
 
+        function showHistory() {
+            document.getElementById('wordsGrid').classList.add('hidden');
+            document.getElementById('searchBox').classList.add('hidden');
+            document.getElementById('controls').classList.add('hidden');
+            document.getElementById('stats').classList.add('hidden');
+            document.getElementById('historyPanel').classList.remove('hidden');
+
+            const stats = currentUser.stats;
+            const accuracy = stats.totalAnswers > 0
+                ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100)
+                : 0;
+
+            document.getElementById('historyStats').innerHTML = `
+                <div class="stat-card">
+                    <div class="number">${stats.totalQuizzes}</div>
+                    <div class="label">מבחנים</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${accuracy}%</div>
+                    <div class="label">דיוק</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${stats.correctAnswers}</div>
+                    <div class="label">תשובות נכונות</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${currentUser.blacklist.length}</div>
+                    <div class="label">ברשימה שחורה</div>
+                </div>
+            `;
+
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            currentUser.history.slice(0, 50).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                const date = new Date(item.date);
+                const dateStr = `${date.toLocaleDateString('he-IL')} ${date.toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit'})}`;
+
+                let resultClass = '';
+                if (item.action === 'wrong_answer') resultClass = 'bad';
+                if (item.action === 'quiz_end' && item.details.includes('100%')) resultClass = 'good';
+
+                div.innerHTML = `
+                    <span class="date">${dateStr}</span>
+                    <span class="action">${item.details}</span>
+                `;
+                historyList.appendChild(div);
+            });
+
+            if (currentUser.history.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">אין היסטוריה עדיין</div>';
+            }
+        }
+
+        function hideHistory() {
+            document.getElementById('wordsGrid').classList.remove('hidden');
+            document.getElementById('searchBox').classList.remove('hidden');
+            document.getElementById('controls').classList.remove('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            document.getElementById('historyPanel').classList.add('hidden');
+        }
+
         // Event listeners
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            login(document.getElementById('usernameInput').value);
+        });
+
+        document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login(document.getElementById('usernameInput').value);
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('historyBtn').addEventListener('click', showHistory);
+        document.getElementById('closeHistory').addEventListener('click', hideHistory);
+
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1362,7 +1914,7 @@
                 if (btn.dataset.list === 'quiz') {
                     startQuiz();
                 } else {
-                    if (document.getElementById('quizMode').classList.contains('hidden') === false) {
+                    if (!document.getElementById('quizMode').classList.contains('hidden')) {
                         exitQuiz();
                     }
                     currentList = btn.dataset.list;
@@ -1397,8 +1949,10 @@
             showQuizQuestion();
         });
 
+        document.getElementById('quizExit').addEventListener('click', exitQuiz);
+
         // Initialize
-        renderWords(getAllWords());
+        showExistingUsers();
     </script>
 </body>
 </html>
