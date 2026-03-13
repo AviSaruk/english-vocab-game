@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לומדת אוצר מילים באנגלית</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding: 12px 20px;
+            width: 100%;
+            max-width: 400px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+        }
+
+        .words-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .word-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .word-card.revealed {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .english-word {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            direction: ltr;
+        }
+
+        .word-card.revealed .english-word {
+            color: white;
+        }
+
+        .hebrew-translation {
+            font-size: 1.1em;
+            color: white;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .word-card.revealed .hebrew-translation {
+            display: block;
+        }
+
+        .speaker-icon {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.2em;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .word-card:hover .speaker-icon {
+            opacity: 1;
+        }
+
+        .word-card.revealed .speaker-icon {
+            color: white;
+        }
+
+        .stats {
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 10px 25px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .quiz-mode {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .quiz-word {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 20px;
+            direction: ltr;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1em;
+        }
+
+        .quiz-option:hover {
+            background: #f0f0ff;
+        }
+
+        .quiz-option.correct {
+            background: #38ef7d;
+            border-color: #38ef7d;
+            color: white;
+        }
+
+        .quiz-option.wrong {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            color: white;
+        }
+
+        .quiz-score {
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .quiz-next {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+
+        .quiz-next:hover {
+            background: #764ba2;
+        }
+
+        @media (max-width: 600px) {
+            .words-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .word-card {
+                padding: 15px;
+                min-height: 80px;
+            }
+
+            .english-word {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>לומדת אוצר מילים באנגלית</h1>
+        <p class="instructions">לחצו על מילה כדי לראות את התרגום ולשמוע את ההגייה</p>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-list="all">הכל</button>
+            <button class="tab-btn" data-list="LISTA">רשימה A</button>
+            <button class="tab-btn" data-list="LISTB">רשימה B</button>
+            <button class="tab-btn" data-list="LISTC">רשימה C</button>
+            <button class="tab-btn" data-list="LISTD">רשימה D</button>
+            <button class="tab-btn" data-list="quiz">מבחן</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="חפש מילה...">
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" id="revealAll">הצג הכל</button>
+            <button class="control-btn" id="hideAll">הסתר הכל</button>
+            <button class="control-btn" id="shuffle">ערבב</button>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="words-grid" id="wordsGrid"></div>
+
+        <div class="quiz-mode hidden" id="quizMode">
+            <div class="quiz-score" id="quizScore">ניקוד: 0/0</div>
+            <div class="quiz-word" id="quizWord"></div>
+            <div class="quiz-options" id="quizOptions"></div>
+            <button class="quiz-next hidden" id="quizNext">המילה הבאה</button>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = {
+            "LISTA": [
+                {en: "addition", he: "תוספת"},
+                {en: "advance", he: "התקדמות"},
+                {en: "advanced", he: "מתקדם"},
+                {en: "advertising", he: "פרסום"},
+                {en: "among other things", he: "בין היתר"},
+                {en: "analysis", he: "ניתוח"},
+                {en: "appear", he: "להופיע, להיראות"},
+                {en: "approach", he: "גישה, לגשת"},
+                {en: "as", he: "כאשר, בזמן ש"},
+                {en: "at least", he: "לפחות"},
+                {en: "average", he: "ממוצע"},
+                {en: "be responsible for", he: "להיות אחראי על"},
+                {en: "before", he: "לפני"},
+                {en: "besides", he: "חוץ מזה, בנוסף"},
+                {en: "can", he: "יכול (אפשרות)"},
+                {en: "challenge", he: "אתגר, לאתגר"},
+                {en: "chance", he: "סיכוי, הזדמנות"},
+                {en: "change", he: "שינוי, לשנות"},
+                {en: "characteristic", he: "מאפיין, תכונה"},
+                {en: "claim", he: "טענה, לטעון"},
+                {en: "come after/first/last", he: "לבוא אחרי/ראשון/אחרון"},
+                {en: "common", he: "נפוץ, משותף"},
+                {en: "complicated", he: "מסובך"},
+                {en: "concern", he: "דאגה, לדאוג"},
+                {en: "conditions", he: "תנאים"},
+                {en: "conduct", he: "לבצע, להוביל"},
+                {en: "consequence", he: "תוצאה, השלכה"},
+                {en: "considerable", he: "ניכר, משמעותי"},
+                {en: "cope", he: "להתמודד"},
+                {en: "critic", he: "מבקר"},
+                {en: "current", he: "נוכחי, עכשווי"},
+                {en: "decrease", he: "ירידה, לרדת"},
+                {en: "delayed", he: "מעוכב, מאוחר"},
+                {en: "deliberately", he: "בכוונה"},
+                {en: "demonstrate", he: "להדגים, להפגין"},
+                {en: "design", he: "עיצוב, לעצב"},
+                {en: "destruction", he: "הרס"},
+                {en: "development", he: "התפתחות, פיתוח"},
+                {en: "disagreement", he: "מחלוקת, אי-הסכמה"},
+                {en: "disaster", he: "אסון"},
+                {en: "discovery", he: "גילוי, תגלית"},
+                {en: "dislike", he: "סלידה, לא לאהוב"},
+                {en: "do", he: "לעשות (להדגשה)"},
+                {en: "doubt", he: "ספק, לפקפק"},
+                {en: "drop", he: "טיפה, ליפול"},
+                {en: "educate", he: "לחנך"},
+                {en: "efficient", he: "יעיל"},
+                {en: "emphasis", he: "דגש"},
+                {en: "enjoyable", he: "מהנה"},
+                {en: "essay", he: "חיבור, מאמר"},
+                {en: "essentially", he: "בעיקרו של דבר"},
+                {en: "even if", he: "אפילו אם"},
+                {en: "even though", he: "למרות ש"},
+                {en: "event", he: "אירוע"},
+                {en: "exactly", he: "בדיוק"},
+                {en: "except that", he: "חוץ מזה ש"},
+                {en: "exist", he: "להתקיים"},
+                {en: "extraordinary", he: "יוצא דופן"},
+                {en: "feature", he: "תכונה, מאפיין"},
+                {en: "feedback", he: "משוב"},
+                {en: "figure", he: "דמות, מספר"},
+                {en: "financial", he: "כספי, פיננסי"},
+                {en: "finding/findings", he: "ממצא/ממצאים"},
+                {en: "flexible", he: "גמיש"},
+                {en: "flood", he: "שיטפון, להציף"},
+                {en: "flu", he: "שפעת"},
+                {en: "focus on", he: "להתמקד ב"},
+                {en: "focus", he: "מיקוד"},
+                {en: "frequent", he: "תכוף"},
+                {en: "fresh", he: "טרי, חדש"},
+                {en: "frighten", he: "להפחיד"},
+                {en: "from", he: "מ (מיקום, מקור)"},
+                {en: "gain", he: "רווח, להרוויח"},
+                {en: "generate", he: "לייצר, ליצור"},
+                {en: "guidance", he: "הדרכה, הכוונה"},
+                {en: "hopefully", he: "בתקווה"},
+                {en: "ideal", he: "אידיאלי"},
+                {en: "illness", he: "מחלה"},
+                {en: "illustrate", he: "להמחיש"},
+                {en: "image", he: "תמונה, דימוי"},
+                {en: "in", he: "ב (מצב, רגש)"},
+                {en: "in terms of", he: "מבחינת"},
+                {en: "in actual fact", he: "למעשה"},
+                {en: "in connection with", he: "בקשר ל"},
+                {en: "in that case", he: "במקרה כזה"},
+                {en: "in the meantime", he: "בינתיים"},
+                {en: "initial", he: "ראשוני"},
+                {en: "instruction", he: "הוראה, הדרכה"},
+                {en: "intelligence", he: "אינטליגנציה, מודיעין"},
+                {en: "interest", he: "עניין, ריבית"},
+                {en: "introduce", he: "להציג, להכניס"},
+                {en: "invest", he: "להשקיע"},
+                {en: "investigate", he: "לחקור"},
+                {en: "just about", he: "כמעט"},
+                {en: "keep on doing", he: "להמשיך לעשות"},
+                {en: "kind of", he: "קצת, סוג של"},
+                {en: "knowledge", he: "ידע"},
+                {en: "lack", he: "חוסר, לחסר"},
+                {en: "landscape", he: "נוף"},
+                {en: "likely", he: "סביר"},
+                {en: "limited", he: "מוגבל"},
+                {en: "little", he: "מעט"},
+                {en: "look at", he: "להסתכל על"},
+                {en: "low", he: "נמוך"},
+                {en: "material", he: "חומר"},
+                {en: "mean", he: "להתכוון, ממוצע"},
+                {en: "means", he: "אמצעי"},
+                {en: "measure", he: "מידה, למדוד"},
+                {en: "mention", he: "לציין, להזכיר"},
+                {en: "miss", he: "לפספס, להחמיץ"},
+                {en: "misunderstand", he: "להבין לא נכון"},
+                {en: "more or less", he: "פחות או יותר"},
+                {en: "must", he: "חייב (סביר)"},
+                {en: "naturally", he: "באופן טבעי"},
+                {en: "nature", he: "טבע, אופי"},
+                {en: "necessarily", he: "בהכרח"},
+                {en: "nevertheless", he: "עם זאת"},
+                {en: "not at all", he: "בכלל לא"},
+                {en: "not only", he: "לא רק"},
+                {en: "notice", he: "הודעה, לשים לב"},
+                {en: "objective", he: "מטרה, אובייקטיבי"},
+                {en: "occasional", he: "מזדמן"},
+                {en: "official", he: "רשמי"},
+                {en: "on the one hand... on the other hand", he: "מצד אחד... מצד שני"},
+                {en: "once", he: "ברגע ש"},
+                {en: "others", he: "אחרים"},
+                {en: "otherwise", he: "אחרת"},
+                {en: "out of date", he: "מיושן"},
+                {en: "participate", he: "להשתתף"},
+                {en: "particular", he: "מסוים, מיוחד"},
+                {en: "past", he: "עבר, בעבר"},
+                {en: "perform", he: "לבצע, להופיע"},
+                {en: "personality", he: "אישיות"},
+                {en: "personally", he: "באופן אישי"},
+                {en: "planet", he: "כוכב לכת"},
+                {en: "planning", he: "תכנון"},
+                {en: "plant", he: "צמח, מפעל"},
+                {en: "point of view", he: "נקודת מבט"},
+                {en: "policy", he: "מדיניות"},
+                {en: "pollution", he: "זיהום"},
+                {en: "popular", he: "פופולרי"},
+                {en: "population", he: "אוכלוסייה"},
+                {en: "prevent", he: "למנוע"},
+                {en: "priority", he: "עדיפות"},
+                {en: "private", he: "פרטי"},
+                {en: "probable", he: "סביר"},
+                {en: "produce", he: "לייצר"},
+                {en: "profession", he: "מקצוע"},
+                {en: "professor", he: "פרופסור"},
+                {en: "proof", he: "הוכחה"},
+                {en: "proposed", he: "מוצע"},
+                {en: "protest", he: "מחאה, להפגין"},
+                {en: "provided (that)", he: "בתנאי ש"},
+                {en: "psychology", he: "פסיכולוגיה"},
+                {en: "public", he: "ציבורי"},
+                {en: "purpose", he: "מטרה"},
+                {en: "quality", he: "איכות"},
+                {en: "question", he: "שאלה, לשאול"},
+                {en: "questionnaire", he: "שאלון"},
+                {en: "react", he: "להגיב"},
+                {en: "reasonable", he: "סביר, הגיוני"},
+                {en: "recommend", he: "להמליץ"},
+                {en: "recycle", he: "למחזר"},
+                {en: "regard", he: "התחשבות, להתייחס"},
+                {en: "region", he: "אזור"},
+                {en: "regular", he: "רגיל, קבוע"},
+                {en: "relevant", he: "רלוונטי"},
+                {en: "reliable", he: "אמין"},
+                {en: "rely on", he: "לסמוך על"},
+                {en: "request", he: "בקשה, לבקש"},
+                {en: "research", he: "מחקר"},
+                {en: "result", he: "תוצאה"},
+                {en: "review", he: "סקירה, לסקור"},
+                {en: "revise", he: "לתקן, לחזור על"},
+                {en: "risk", he: "סיכון"},
+                {en: "run out of", he: "להיגמר ל"},
+                {en: "rural", he: "כפרי"},
+                {en: "salary", he: "משכורת"},
+                {en: "sample", he: "דוגמה, דגימה"},
+                {en: "seldom", he: "לעיתים רחוקות"},
+                {en: "sense", he: "חוש, תחושה"},
+                {en: "set up", he: "להקים"},
+                {en: "significant", he: "משמעותי"},
+                {en: "skilled", he: "מיומן"},
+                {en: "slight", he: "קל, קלוש"},
+                {en: "specialist", he: "מומחה"},
+                {en: "specific", he: "ספציפי"},
+                {en: "still", he: "עדיין"},
+                {en: "structure", he: "מבנה"},
+                {en: "study", he: "מחקר, ללמוד"},
+                {en: "supposed", he: "אמור"},
+                {en: "surface", he: "משטח"},
+                {en: "take advantage of", he: "לנצל"},
+                {en: "thanks to", he: "בזכות"},
+                {en: "theory", he: "תיאוריה"},
+                {en: "throw away", he: "לזרוק"},
+                {en: "transport", he: "תחבורה, להוביל"},
+                {en: "trash", he: "זבל"},
+                {en: "treatment", he: "טיפול"},
+                {en: "unfortunately", he: "למרבה הצער"},
+                {en: "unhealthy", he: "לא בריא"},
+                {en: "unique", he: "ייחודי"},
+                {en: "united", he: "מאוחד"},
+                {en: "universe", he: "יקום"},
+                {en: "unknown", he: "לא ידוע"},
+                {en: "unlike", he: "בניגוד ל"},
+                {en: "unlikely", he: "לא סביר"},
+                {en: "urban", he: "עירוני"},
+                {en: "vary", he: "להשתנות"},
+                {en: "view", he: "נוף, דעה"},
+                {en: "visible", he: "נראה לעין"},
+                {en: "vision", he: "חזון, ראייה"},
+                {en: "volume", he: "עוצמה, נפח"},
+                {en: "whom", he: "את מי, למי"},
+                {en: "wildlife", he: "חיות בר"},
+                {en: "within", he: "בתוך"},
+                {en: "worthwhile", he: "כדאי"},
+                {en: "would", he: "היה (תנאי)"}
+            ],
+            "LISTB": [
+                {en: "above", he: "מעל"},
+                {en: "account", he: "חשבון, סיפור"},
+                {en: "acquire", he: "לרכוש"},
+                {en: "age", he: "גיל, עידן"},
+                {en: "agriculture", he: "חקלאות"},
+                {en: "all of a sudden", he: "פתאום"},
+                {en: "altogether", he: "בסך הכל"},
+                {en: "anxious", he: "חרד, מודאג"},
+                {en: "apparent", he: "ברור, נראה לעין"},
+                {en: "appropriate", he: "מתאים"},
+                {en: "atmosphere", he: "אווירה, אטמוספרה"},
+                {en: "automatically", he: "אוטומטית"},
+                {en: "bad", he: "רע"},
+                {en: "be in charge", he: "להיות אחראי"},
+                {en: "be situated", he: "להיות ממוקם"},
+                {en: "behind", he: "מאחורי"},
+                {en: "believe in", he: "להאמין ב"},
+                {en: "blame", he: "להאשים"},
+                {en: "block", he: "חסימה, לחסום"},
+                {en: "brilliant", he: "מבריק, נפלא"},
+                {en: "bring up", he: "לגדל, להעלות"},
+                {en: "calculate", he: "לחשב"},
+                {en: "clothing", he: "ביגוד"},
+                {en: "competitive", he: "תחרותי"},
+                {en: "contemporary", he: "עכשווי, בן זמננו"},
+                {en: "contest", he: "תחרות"},
+                {en: "continent", he: "יבשת"},
+                {en: "copy", he: "עותק, להעתיק"},
+                {en: "criterion", he: "קריטריון"},
+                {en: "cut down", he: "לצמצם, לכרות"},
+                {en: "decade", he: "עשור"},
+                {en: "declare", he: "להכריז"},
+                {en: "degree", he: "תואר, מעלה"},
+                {en: "deliver", he: "לספק, למסור"},
+                {en: "demanding", he: "תובעני"},
+                {en: "detect", he: "לגלות, לזהות"},
+                {en: "determine", he: "לקבוע"},
+                {en: "differ", he: "להיות שונה"},
+                {en: "disappointed", he: "מאוכזב"},
+                {en: "divide", he: "לחלק"},
+                {en: "domestic", he: "ביתי, מקומי"},
+                {en: "done", he: "גמור"},
+                {en: "double", he: "כפול"},
+                {en: "economical", he: "חסכוני"},
+                {en: "editor", he: "עורך"},
+                {en: "either way", he: "כך או כך"},
+                {en: "element", he: "יסוד, אלמנט"},
+                {en: "emerge", he: "לצוץ, להתגלות"},
+                {en: "emotion", he: "רגש"},
+                {en: "exception", he: "יוצא מן הכלל"},
+                {en: "exchange", he: "החלפה, להחליף"},
+                {en: "expected", he: "צפוי"},
+                {en: "expedition", he: "משלחת"},
+                {en: "expense", he: "הוצאה"},
+                {en: "export", he: "יצוא, לייצא"},
+                {en: "expression", he: "ביטוי"},
+                {en: "extend", he: "להרחיב, להאריך"},
+                {en: "extreme", he: "קיצוני"},
+                {en: "farther/further", he: "רחוק יותר"},
+                {en: "fed up", he: "נמאס ל"},
+                {en: "fetch", he: "להביא"},
+                {en: "final", he: "סופי"},
+                {en: "fit", he: "מתאים, כושר"},
+                {en: "generation", he: "דור"},
+                {en: "genuine", he: "אמיתי, כן"},
+                {en: "get rid of", he: "להיפטר מ"},
+                {en: "get sth wrong", he: "לטעות במשהו"},
+                {en: "get worse", he: "להחמיר"},
+                {en: "give away", he: "לתת, לחשוף"},
+                {en: "go out", he: "לצאת"},
+                {en: "hidden", he: "מוסתר"},
+                {en: "highlight", he: "להדגיש"},
+                {en: "historian", he: "היסטוריון"},
+                {en: "historic", he: "היסטורי"},
+                {en: "identical", he: "זהה"},
+                {en: "immigration", he: "הגירה"},
+                {en: "import", he: "יבוא, לייבא"},
+                {en: "impress", he: "להרשים"},
+                {en: "impression", he: "רושם"},
+                {en: "incredible", he: "מדהים, לא יאומן"},
+                {en: "indoors", he: "בפנים"},
+                {en: "infection", he: "זיהום"},
+                {en: "input", he: "קלט"},
+                {en: "inside", he: "בפנים"},
+                {en: "interaction", he: "אינטראקציה"},
+                {en: "interpret", he: "לפרש"},
+                {en: "interrupt", he: "להפריע"},
+                {en: "involvement", he: "מעורבות"},
+                {en: "issue", he: "סוגיה, גיליון"},
+                {en: "it looks like", he: "נראה ש"},
+                {en: "jam", he: "ריבה, פקק"},
+                {en: "journalist", he: "עיתונאי"},
+                {en: "judgment", he: "שיפוט"},
+                {en: "just as", he: "בדיוק כמו"},
+                {en: "justice", he: "צדק"},
+                {en: "keen", he: "נלהב"},
+                {en: "keep", he: "לשמור"},
+                {en: "kit", he: "ערכה"},
+                {en: "learn", he: "ללמוד"},
+                {en: "lecture", he: "הרצאה"},
+                {en: "light", he: "אור, קל"},
+                {en: "living", he: "מחיה, חי"},
+                {en: "logical", he: "הגיוני"},
+                {en: "look forward to", he: "לצפות בציפייה"},
+                {en: "lower", he: "להוריד, תחתון"},
+                {en: "make sense", he: "הגיוני"},
+                {en: "make up", he: "להמציא, לפצות"},
+                {en: "make up your mind", he: "להחליט"},
+                {en: "mend", he: "לתקן"},
+                {en: "mixture", he: "תערובת"},
+                {en: "monthly", he: "חודשי"},
+                {en: "mystery", he: "תעלומה"},
+                {en: "name", he: "שם, לקרוא בשם"},
+                {en: "native", he: "ילידי"},
+                {en: "neither...nor", he: "לא...ולא"},
+                {en: "nightmare", he: "סיוט"},
+                {en: "nonsense", he: "שטויות"},
+                {en: "not a word", he: "אף מילה"},
+                {en: "not until", he: "רק כאשר"},
+                {en: "occupation", he: "מקצוע, כיבוש"},
+                {en: "occupy", he: "לתפוס, לכבוש"},
+                {en: "oil", he: "שמן, נפט"},
+                {en: "on the whole", he: "בסך הכל"},
+                {en: "open", he: "פתוח, לפתוח"},
+                {en: "operate", he: "להפעיל, לנתח"},
+                {en: "organ", he: "איבר"},
+                {en: "organization", he: "ארגון"},
+                {en: "outstanding", he: "יוצא מן הכלל"},
+                {en: "part-time", he: "חלקי"},
+                {en: "patient", he: "סבלני, מטופל"},
+                {en: "peculiar", he: "מוזר, מיוחד"},
+                {en: "place", he: "מקום, לשים"},
+                {en: "point", he: "נקודה"},
+                {en: "position", he: "עמדה, מיקום"},
+                {en: "potential", he: "פוטנציאל"},
+                {en: "preference", he: "העדפה"},
+                {en: "present", he: "הווה, מתנה"},
+                {en: "pressure", he: "לחץ"},
+                {en: "prime", he: "ראשי, עיקרי"},
+                {en: "principal", he: "מנהל, עיקרי"},
+                {en: "promote", he: "לקדם"},
+                {en: "put up with", he: "לסבול"},
+                {en: "reach", he: "להגיע"},
+                {en: "reason", he: "סיבה"},
+                {en: "record", he: "שיא, להקליט"},
+                {en: "reflect", he: "לשקף"},
+                {en: "register", he: "להירשם"},
+                {en: "regret", he: "להתחרט"},
+                {en: "relate", he: "להתקשר, לספר"},
+                {en: "relax", he: "להירגע"},
+                {en: "remark", he: "הערה"},
+                {en: "remote", he: "מרוחק"},
+                {en: "replace", he: "להחליף"},
+                {en: "rescue", he: "להציל"},
+                {en: "respect", he: "כבוד, לכבד"},
+                {en: "retire", he: "לפרוש"},
+                {en: "right", he: "זכות, נכון"},
+                {en: "role", he: "תפקיד"},
+                {en: "room", he: "חדר, מקום"},
+                {en: "rough", he: "גס, קשה"},
+                {en: "rule", he: "כלל, לשלוט"},
+                {en: "run", he: "לרוץ, לנהל"},
+                {en: "rush", he: "למהר"},
+                {en: "satisfy", he: "לספק"},
+                {en: "scale", he: "קנה מידה"},
+                {en: "scene", he: "סצנה, זירה"},
+                {en: "schedule", he: "לוח זמנים"},
+                {en: "sensitive", he: "רגיש"},
+                {en: "service", he: "שירות"},
+                {en: "set", he: "סט, לקבוע"},
+                {en: "setting", he: "סביבה, רקע"},
+                {en: "shortly", he: "בקרוב"},
+                {en: "shut down", he: "לסגור, לכבות"},
+                {en: "similarity", he: "דמיון"},
+                {en: "slow down", he: "להאט"},
+                {en: "so-called", he: "מה שנקרא"},
+                {en: "society", he: "חברה"},
+                {en: "sooner or later", he: "במוקדם או במאוחר"},
+                {en: "spectacular", he: "מרהיב"},
+                {en: "speech", he: "נאום"},
+                {en: "spoil", he: "לקלקל, לפנק"},
+                {en: "start off", he: "להתחיל"},
+                {en: "style", he: "סגנון"},
+                {en: "sum up", he: "לסכם"},
+                {en: "summary", he: "סיכום"},
+                {en: "support", he: "תמיכה, לתמוך"},
+                {en: "survive", he: "לשרוד"},
+                {en: "take into account", he: "לקחת בחשבון"},
+                {en: "take part", he: "לקחת חלק"},
+                {en: "take place", he: "להתרחש"},
+                {en: "take the opportunity", he: "לנצל את ההזדמנות"},
+                {en: "take seriously", he: "לקחת ברצינות"},
+                {en: "take responsibility", he: "לקחת אחריות"},
+                {en: "the headlines", he: "הכותרות"},
+                {en: "the heart of", he: "לב העניין"},
+                {en: "the main thing", he: "העיקר"},
+                {en: "the reality of", he: "המציאות של"},
+                {en: "theme", he: "נושא"},
+                {en: "to", he: "ל (כיוון)"},
+                {en: "to start with", he: "מלכתחילה"},
+                {en: "treasure", he: "אוצר"},
+                {en: "try", he: "לנסות"},
+                {en: "turn", he: "פנייה, תור"},
+                {en: "uncomfortable", he: "לא נוח"},
+                {en: "underneath", he: "מתחת"},
+                {en: "understand", he: "להבין"},
+                {en: "undo", he: "לבטל"},
+                {en: "unemployed", he: "מובטל"},
+                {en: "unexpected", he: "בלתי צפוי"},
+                {en: "up-to-date", he: "עדכני"},
+                {en: "urgent", he: "דחוף"},
+                {en: "use up", he: "לכלות"},
+                {en: "virtual reality", he: "מציאות מדומה"},
+                {en: "vowel", he: "תנועה (אות)"},
+                {en: "waste", he: "בזבוז, לבזבז"},
+                {en: "wealth", he: "עושר"},
+                {en: "welcome", he: "ברוך הבא"},
+                {en: "wherever", he: "בכל מקום ש"}
+            ],
+            "LISTC": [
+                {en: "on your own", he: "לבד"},
+                {en: "any minute now", he: "בכל רגע"},
+                {en: "in your twenties", he: "בשנות העשרים שלך"},
+                {en: "absorb", he: "לספוג"},
+                {en: "access", he: "גישה"},
+                {en: "ambition", he: "שאיפה"},
+                {en: "annoy", he: "להרגיז"},
+                {en: "argue", he: "להתווכח"},
+                {en: "as a matter of fact", he: "למעשה"},
+                {en: "ashamed", he: "מתבייש"},
+                {en: "aside", he: "הצידה"},
+                {en: "assure", he: "להבטיח"},
+                {en: "at his best", he: "במיטבו"},
+                {en: "attraction", he: "אטרקציה, משיכה"},
+                {en: "awareness", he: "מודעות"},
+                {en: "barely", he: "בקושי"},
+                {en: "barrier", he: "מחסום"},
+                {en: "be about to", he: "עומד ל"},
+                {en: "be out of", he: "להיגמר"},
+                {en: "beat", he: "להכות, לנצח"},
+                {en: "bend", he: "לכופף"},
+                {en: "biology", he: "ביולוגיה"},
+                {en: "bitter", he: "מר"},
+                {en: "bold", he: "נועז"},
+                {en: "bother", he: "להטריד"},
+                {en: "bottom", he: "תחתית"},
+                {en: "breeze", he: "משב רוח"},
+                {en: "brilliant", he: "מבריק"},
+                {en: "can tell", he: "יכול לדעת"},
+                {en: "capacity", he: "יכולת, קיבולת"},
+                {en: "cash", he: "מזומן"},
+                {en: "capture", he: "ללכוד"},
+                {en: "casual", he: "לא רשמי"},
+                {en: "ceremony", he: "טקס"},
+                {en: "chairperson", he: "יו\"ר"},
+                {en: "chase", he: "לרדוף"},
+                {en: "cheat", he: "לרמות"},
+                {en: "classic", he: "קלאסי"},
+                {en: "clinic", he: "מרפאה"},
+                {en: "coach", he: "מאמן"},
+                {en: "collector", he: "אספן"},
+                {en: "correspond", he: "להתכתב"},
+                {en: "costume", he: "תחפושת"},
+                {en: "courage", he: "אומץ"},
+                {en: "cover", he: "לכסות"},
+                {en: "cure", he: "לרפא, תרופה"},
+                {en: "cyberbullying", he: "בריונות רשת"},
+                {en: "cycle", he: "מחזור, לרכוב"},
+                {en: "deaf", he: "חירש"},
+                {en: "debt", he: "חוב"},
+                {en: "decorate", he: "לקשט"},
+                {en: "dedicate", he: "להקדיש"},
+                {en: "departure", he: "יציאה"},
+                {en: "deposit", he: "פיקדון"},
+                {en: "deserve", he: "להיות ראוי"},
+                {en: "destination", he: "יעד"},
+                {en: "direct", he: "ישיר"},
+                {en: "disabled", he: "נכה"},
+                {en: "dispute", he: "מחלוקת"},
+                {en: "distinguish", he: "להבחין"},
+                {en: "disturb", he: "להפריע"},
+                {en: "do a good job", he: "לעשות עבודה טובה"},
+                {en: "dozen", he: "תריסר"},
+                {en: "draft", he: "טיוטה"},
+                {en: "dramatic", he: "דרמטי"},
+                {en: "earth", he: "כדור הארץ"},
+                {en: "earthquake", he: "רעידת אדמה"},
+                {en: "elderly", he: "קשיש"},
+                {en: "enter", he: "להיכנס"},
+                {en: "episode", he: "פרק"},
+                {en: "equal", he: "שווה"},
+                {en: "escape", he: "לברוח"},
+                {en: "fare", he: "מחיר נסיעה"},
+                {en: "fire", he: "אש, לפטר"},
+                {en: "firm", he: "חברה, יציב"},
+                {en: "float", he: "לצוף"},
+                {en: "fold", he: "לקפל"},
+                {en: "follow", he: "לעקוב"},
+                {en: "for the sake of", he: "למען"},
+                {en: "formal", he: "רשמי"},
+                {en: "former", he: "לשעבר"},
+                {en: "fortune", he: "הון, מזל"},
+                {en: "free", he: "חופשי, חינם"},
+                {en: "free will", he: "בחירה חופשית"},
+                {en: "frozen", he: "קפוא"},
+                {en: "generous", he: "נדיב"},
+                {en: "get", he: "לקבל, להשיג"},
+                {en: "get in touch", he: "ליצור קשר"},
+                {en: "give in/up", he: "לוותר"},
+                {en: "give up", he: "לוותר על"},
+                {en: "go ahead", he: "להמשיך, בבקשה"},
+                {en: "grab", he: "לתפוס"},
+                {en: "grateful", he: "אסיר תודה"},
+                {en: "hardware", he: "חומרה"},
+                {en: "headquarters", he: "מטה"},
+                {en: "here you are", he: "הנה, בבקשה"},
+                {en: "hold up", he: "לעכב"},
+                {en: "honesty", he: "יושר"},
+                {en: "idiom", he: "ביטוי"},
+                {en: "in turn", he: "בתורו"},
+                {en: "incident", he: "תקרית"},
+                {en: "laugh", he: "לצחוק"},
+                {en: "layer", he: "שכבה"},
+                {en: "leave behind", he: "להשאיר מאחור"},
+                {en: "let out", he: "לשחרר"},
+                {en: "let in", he: "להכניס"},
+                {en: "light", he: "אור, קל"},
+                {en: "lightly", he: "בקלילות"},
+                {en: "liquid", he: "נוזל"},
+                {en: "lively", he: "תוסס"},
+                {en: "load", he: "עומס, לטעון"},
+                {en: "loan", he: "הלוואה"},
+                {en: "log in/on", he: "להתחבר"},
+                {en: "log off/out", he: "להתנתק"},
+                {en: "lonely", he: "בודד"},
+                {en: "look", he: "להסתכל, מראה"},
+                {en: "lose interest", he: "לאבד עניין"},
+                {en: "maker", he: "יצרן"},
+                {en: "mark", he: "סימן, ציון"},
+                {en: "marvelous", he: "נפלא"},
+                {en: "mayor", he: "ראש עיר"},
+                {en: "melt", he: "להמס"},
+                {en: "membership", he: "חברות"},
+                {en: "message", he: "הודעה"},
+                {en: "might as well", he: "אפשר גם"},
+                {en: "miss", he: "לפספס, להתגעגע"},
+                {en: "modest", he: "צנוע"},
+                {en: "mood", he: "מצב רוח"},
+                {en: "name", he: "שם"},
+                {en: "off", he: "כבוי, הנחה"},
+                {en: "offense", he: "עבירה"},
+                {en: "once in a while", he: "מדי פעם"},
+                {en: "or so", he: "בערך"},
+                {en: "organic", he: "אורגני"},
+                {en: "pace", he: "קצב"},
+                {en: "partner", he: "שותף"},
+                {en: "pause", he: "הפסקה"},
+                {en: "peaceful", he: "שליו"},
+                {en: "plot", he: "עלילה, מזימה"},
+                {en: "position", he: "עמדה, מיקום"},
+                {en: "pour", he: "לשפוך"},
+                {en: "powder", he: "אבקה"},
+                {en: "preposition", he: "מילת יחס"},
+                {en: "pride", he: "גאווה"},
+                {en: "punish", he: "להעניש"},
+                {en: "quarrel", he: "ריב"},
+                {en: "quit", he: "להפסיק, לעזוב"},
+                {en: "race", he: "מירוץ, גזע"},
+                {en: "raw", he: "גולמי"},
+                {en: "reassure", he: "להרגיע"},
+                {en: "remain calm", he: "להישאר רגוע"},
+                {en: "reserve", he: "לשמור, עתודה"},
+                {en: "server", he: "שרת"},
+                {en: "shame", he: "בושה"},
+                {en: "shaming", he: "ביוש"},
+                {en: "shelter", he: "מקלט"},
+                {en: "show up", he: "להופיע"},
+                {en: "side", he: "צד"},
+                {en: "sign", he: "שלט, סימן"},
+                {en: "signal", he: "איתות"},
+                {en: "sink", he: "כיור, לשקוע"},
+                {en: "slip", he: "להחליק"},
+                {en: "smart", he: "חכם"},
+                {en: "smooth", he: "חלק"},
+                {en: "so did we", he: "גם אנחנו"},
+                {en: "some kind of", he: "סוג של"},
+                {en: "somewhere around", he: "בסביבות"},
+                {en: "sound angry", he: "להישמע כועס"},
+                {en: "speak about", he: "לדבר על"},
+                {en: "special offer", he: "מבצע"},
+                {en: "speed", he: "מהירות"},
+                {en: "spill", he: "לשפוך"},
+                {en: "spirit", he: "רוח"},
+                {en: "spread", he: "להתפשט"},
+                {en: "stay", he: "להישאר"},
+                {en: "strengthen", he: "לחזק"},
+                {en: "strike", he: "שביתה, להכות"},
+                {en: "strong", he: "חזק"},
+                {en: "struggle", he: "מאבק"},
+                {en: "subway", he: "רכבת תחתית"},
+                {en: "suffer from", he: "לסבול מ"},
+                {en: "super", he: "סופר, מעולה"},
+                {en: "swear", he: "להישבע, לקלל"},
+                {en: "suspect", he: "חשוד, לחשוד"},
+                {en: "switch", he: "מתג, להחליף"},
+                {en: "symbol", he: "סמל"},
+                {en: "table", he: "שולחן, טבלה"},
+                {en: "take pleasure", he: "ליהנות"},
+                {en: "take sb's place", he: "לתפוס את מקומו"},
+                {en: "tear", he: "לקרוע, דמעה"},
+                {en: "term", he: "מונח, סמסטר"},
+                {en: "terminal", he: "טרמינל"},
+                {en: "that kind of thing", he: "דברים כאלה"},
+                {en: "that's it", he: "זהו"},
+                {en: "the following day", he: "ביום שלמחרת"},
+                {en: "thief", he: "גנב"},
+                {en: "tight", he: "צמוד, הדוק"},
+                {en: "tip", he: "טיפ, קצה"},
+                {en: "tired of", he: "עייף מ"},
+                {en: "tiring", he: "מעייף"},
+                {en: "touch", he: "לגעת, מגע"},
+                {en: "tough", he: "קשה, מחוספס"},
+                {en: "trade", he: "מסחר"},
+                {en: "transfer", he: "להעביר"},
+                {en: "tribe", he: "שבט"},
+                {en: "trick", he: "טריק"},
+                {en: "turn into", he: "להפוך ל"},
+                {en: "underline", he: "להדגיש"},
+                {en: "union", he: "איחוד"},
+                {en: "use", he: "שימוש"},
+                {en: "via", he: "דרך"},
+                {en: "victim", he: "קורבן"},
+                {en: "warm", he: "חם"},
+                {en: "weakness", he: "חולשה"},
+                {en: "wear out", he: "לבלות"},
+                {en: "weather forecast", he: "תחזית מזג אוויר"},
+                {en: "weigh", he: "לשקול"},
+                {en: "weird", he: "מוזר"},
+                {en: "whatever", he: "מה שלא יהיה"},
+                {en: "Who cares?", he: "למי אכפת?"},
+                {en: "wise", he: "חכם"},
+                {en: "wrap", he: "לעטוף"},
+                {en: "Yours sincerely", he: "בכבוד רב"},
+                {en: "will", he: "רצון, צוואה"}
+            ],
+            "LISTD": [
+                {en: "a little", he: "קצת"},
+                {en: "aggressive", he: "תוקפני"},
+                {en: "air force", he: "חיל אוויר"},
+                {en: "alarm", he: "אזעקה"},
+                {en: "all is well", he: "הכל בסדר"},
+                {en: "all over the place", he: "בכל מקום"},
+                {en: "ambassador", he: "שגריר"},
+                {en: "arrow", he: "חץ"},
+                {en: "artistic", he: "אמנותי"},
+                {en: "at fault", he: "אשם"},
+                {en: "bank", he: "בנק, גדה"},
+                {en: "bank account", he: "חשבון בנק"},
+                {en: "bargain", he: "מציאה"},
+                {en: "base", he: "בסיס"},
+                {en: "bay", he: "מפרץ"},
+                {en: "be expecting a baby", he: "בהריון"},
+                {en: "believe it or not", he: "תאמין או לא"},
+                {en: "bell", he: "פעמון"},
+                {en: "bench", he: "ספסל"},
+                {en: "blow up", he: "לפוצץ"},
+                {en: "boiled", he: "מבושל"},
+                {en: "brake", he: "בלם"},
+                {en: "branch", he: "ענף, סניף"},
+                {en: "brick", he: "לבנה"},
+                {en: "bucket", he: "דלי"},
+                {en: "bug", he: "חרק, באג"},
+                {en: "bull", he: "שור"},
+                {en: "bunch", he: "חבורה, אשכול"},
+                {en: "burst into tears", he: "לפרוץ בבכי"},
+                {en: "bury", he: "לקבור"},
+                {en: "butcher", he: "קצב"},
+                {en: "cab", he: "מונית"},
+                {en: "cabin", he: "בקתה"},
+                {en: "catalog", he: "קטלוג"},
+                {en: "cave", he: "מערה"},
+                {en: "certificate", he: "תעודה"},
+                {en: "charge", he: "לחייב, להטעין"},
+                {en: "check in/out", he: "להירשם/לצאת"},
+                {en: "Cheers!", he: "לחיים!"},
+                {en: "cold", he: "קר, הצטננות"},
+                {en: "collar", he: "צווארון"},
+                {en: "crash", he: "התרסקות"},
+                {en: "cross", he: "לחצות, צלב"},
+                {en: "customs", he: "מכס"},
+                {en: "date", he: "תאריך, דייט"},
+                {en: "deck", he: "סיפון"},
+                {en: "defeat", he: "להביס, תבוסה"},
+                {en: "devil", he: "שטן"},
+                {en: "diagram", he: "תרשים"},
+                {en: "difficult", he: "קשה"},
+                {en: "dishonest", he: "לא ישר"},
+                {en: "disk", he: "דיסק"},
+                {en: "divorce", he: "גירושין"},
+                {en: "Don't ask me!", he: "אל תשאל אותי!"},
+                {en: "Don't ask!", he: "אל תשאל!"},
+                {en: "dreadful", he: "נורא"},
+                {en: "drink", he: "משקה, לשתות"},
+                {en: "drive", he: "לנהוג, נסיעה"},
+                {en: "drop", he: "לזרוק, טיפה"},
+                {en: "drunk", he: "שיכור"},
+                {en: "elbow", he: "מרפק"},
+                {en: "engagement", he: "אירוסין"},
+                {en: "explode", he: "להתפוצץ"},
+                {en: "fall in love", he: "להתאהב"},
+                {en: "fasten", he: "להדק"},
+                {en: "fly", he: "לעוף, זבוב"},
+                {en: "folk", he: "עממי, אנשים"},
+                {en: "fool", he: "טיפש"},
+                {en: "for fun", he: "לשם כיף"},
+                {en: "force", he: "כוח, לאלץ"},
+                {en: "forehead", he: "מצח"},
+                {en: "forgetful", he: "שכחן"},
+                {en: "garage", he: "מוסך"},
+                {en: "gate", he: "שער"},
+                {en: "gentleman", he: "ג'נטלמן"},
+                {en: "get away with", he: "להתחמק מ"},
+                {en: "get in", he: "להיכנס"},
+                {en: "ghost", he: "רוח רפאים"},
+                {en: "giant", he: "ענק"},
+                {en: "grow tired", he: "להתעייף"},
+                {en: "hang about/around", he: "להסתובב"},
+                {en: "hang out", he: "לבלות"},
+                {en: "harbor", he: "נמל"},
+                {en: "heaven", he: "גן עדן"},
+                {en: "heel", he: "עקב"},
+                {en: "hell", he: "גיהינום"},
+                {en: "horror", he: "אימה"},
+                {en: "hunt", he: "לצוד"},
+                {en: "hurry up", he: "למהר"},
+                {en: "hut", he: "צריף"},
+                {en: "immoral", he: "לא מוסרי"},
+                {en: "in tears", he: "בדמעות"},
+                {en: "initial", he: "ראשוני"},
+                {en: "insult", he: "עלבון, להעליב"},
+                {en: "insurance", he: "ביטוח"},
+                {en: "iron", he: "ברזל, מגהץ"},
+                {en: "jog", he: "לרוץ"},
+                {en: "jump", he: "לקפוץ"},
+                {en: "jury", he: "חבר מושבעים"},
+                {en: "knit", he: "לסרוג"},
+                {en: "laser", he: "לייזר"},
+                {en: "lead", he: "להוביל, עופרת"},
+                {en: "learning", he: "למידה"},
+                {en: "lightning", he: "ברק"},
+                {en: "literary", he: "ספרותי"},
+                {en: "loaf", he: "כיכר לחם"},
+                {en: "loose", he: "רפוי"},
+                {en: "madam", he: "גברתי"},
+                {en: "magnificent", he: "מפואר"},
+                {en: "make", he: "לעשות"},
+                {en: "marriage", he: "נישואין"},
+                {en: "mask", he: "מסכה"},
+                {en: "mate", he: "חבר"},
+                {en: "mess", he: "בלגן"},
+                {en: "mineral water", he: "מים מינרליים"},
+                {en: "mix up", he: "לבלבל"},
+                {en: "monster", he: "מפלצת"},
+                {en: "moral", he: "מוסרי, מוסר השכל"},
+                {en: "naked", he: "עירום"},
+                {en: "nasty", he: "מגעיל"},
+                {en: "navy", he: "חיל הים"},
+                {en: "neat", he: "מסודר"},
+                {en: "next door", he: "שכן"},
+                {en: "not believe your eyes", he: "לא להאמין לעיניים"},
+                {en: "nut", he: "אגוז"},
+                {en: "on a diet", he: "בדיאטה"},
+                {en: "on board", he: "על הסיפון"},
+                {en: "on display", he: "בתצוגה"},
+                {en: "on duty", he: "בתורנות"},
+                {en: "orchestra", he: "תזמורת"},
+                {en: "pack", he: "לארוז, חבילה"},
+                {en: "painful", he: "כואב"},
+                {en: "pale", he: "חיוור"},
+                {en: "passage", he: "מעבר, קטע"},
+                {en: "pavement", he: "מדרכה"},
+                {en: "peak", he: "פסגה"},
+                {en: "penalty", he: "עונש, פנדל"},
+                {en: "pill", he: "גלולה"},
+                {en: "pin", he: "סיכה"},
+                {en: "pity", he: "חבל, רחמים"},
+                {en: "pray", he: "להתפלל"},
+                {en: "pregnant", he: "בהריון"},
+                {en: "priest", he: "כומר"},
+                {en: "propose", he: "להציע נישואין"},
+                {en: "pump", he: "משאבה"},
+                {en: "queue", he: "תור"},
+                {en: "racket", he: "מחבט"},
+                {en: "rainbow", he: "קשת"},
+                {en: "range", he: "טווח"},
+                {en: "refund", he: "החזר"},
+                {en: "regards", he: "ד\"ש"},
+                {en: "republic", he: "רפובליקה"},
+                {en: "resort", he: "אתר נופש"},
+                {en: "rob", he: "לשדוד"},
+                {en: "romantic", he: "רומנטי"},
+                {en: "rope", he: "חבל"},
+                {en: "rub out", he: "למחוק"},
+                {en: "rubber", he: "גומי"},
+                {en: "rubbish", he: "זבל, שטויות"},
+                {en: "rude", he: "גס רוח"},
+                {en: "scandal", he: "שערורייה"},
+                {en: "scratch", he: "לגרד, שריטה"},
+                {en: "sculpture", he: "פיסול"},
+                {en: "see off", he: "ללוות"},
+                {en: "selfish", he: "אנוכי"},
+                {en: "separate", he: "נפרד, להפריד"},
+                {en: "shade", he: "צל"},
+                {en: "shake your head", he: "לנענע בראש"},
+                {en: "shave", he: "להתגלח"},
+                {en: "shore", he: "חוף"},
+                {en: "show sb around", he: "לסייר עם"},
+                {en: "shut up", he: "לשתוק"},
+                {en: "sidewalk", he: "מדרכה"},
+                {en: "sigh", he: "להאנח"},
+                {en: "silk", he: "משי"},
+                {en: "sit up straight", he: "לשבת ישר"},
+                {en: "slave", he: "עבד"},
+                {en: "sleeve", he: "שרוול"},
+                {en: "sore", he: "כואב"},
+                {en: "split up", he: "להיפרד"},
+                {en: "sportsman", he: "ספורטאי"},
+                {en: "spot", he: "נקודה, לזהות"},
+                {en: "spy", he: "מרגל"},
+                {en: "squeeze", he: "לסחוט"},
+                {en: "stare", he: "לבהות"},
+                {en: "stay over", he: "להישאר ללילה"},
+                {en: "stay up", he: "להישאר ער"},
+                {en: "steep", he: "תלול"},
+                {en: "step back", he: "לסגת"},
+                {en: "step on", he: "לדרוך על"},
+                {en: "stick", he: "מקל, להדביק"},
+                {en: "strangely enough", he: "למרבה הפליאה"},
+                {en: "stream", he: "נחל, זרם"},
+                {en: "stretch", he: "למתוח"},
+                {en: "strict", he: "קפדן"},
+                {en: "string", he: "חוט, מיתר"},
+                {en: "stripe", he: "פס"},
+                {en: "suit", he: "חליפה, להתאים"},
+                {en: "swear", he: "להישבע"},
+                {en: "sweep", he: "לטאטא"},
+                {en: "sword", he: "חרב"},
+                {en: "tail", he: "זנב"},
+                {en: "take a risk", he: "לקחת סיכון"},
+                {en: "take sb out", he: "להוציא מישהו"},
+                {en: "tap", he: "ברז, להקיש"},
+                {en: "temple", he: "מקדש"},
+                {en: "territory", he: "טריטוריה"},
+                {en: "terror", he: "טרור"},
+                {en: "tie up", he: "לקשור"},
+                {en: "tournament", he: "טורניר"},
+                {en: "track", he: "מסלול"},
+                {en: "tragedy", he: "טרגדיה"},
+                {en: "triangle", he: "משולש"},
+                {en: "tube", he: "שפופרת"},
+                {en: "undressed", he: "לא לבוש"},
+                {en: "unpack", he: "לפרוק"},
+                {en: "van", he: "טנדר"},
+                {en: "verse", he: "פסוק, בית שיר"},
+                {en: "weapon", he: "נשק"},
+                {en: "web", he: "רשת"},
+                {en: "wheat", he: "חיטה"}
+            ]
+        };
+
+        let currentList = 'all';
+        let allWords = [];
+        let quizWords = [];
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizTotal = 0;
+
+        function getAllWords() {
+            let words = [];
+            for (let list in vocabulary) {
+                vocabulary[list].forEach(word => {
+                    words.push({...word, list: list});
+                });
+            }
+            return words;
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
+            speechSynthesis.speak(utterance);
+        }
+
+        function renderWords(words) {
+            const grid = document.getElementById('wordsGrid');
+            grid.innerHTML = '';
+
+            words.forEach((word, index) => {
+                const card = document.createElement('div');
+                card.className = 'word-card';
+                card.innerHTML = `
+                    <span class="speaker-icon">🔊</span>
+                    <div class="english-word">${word.en}</div>
+                    <div class="hebrew-translation">${word.he}</div>
+                `;
+
+                card.addEventListener('click', () => {
+                    card.classList.toggle('revealed');
+                    speak(word.en);
+                });
+
+                grid.appendChild(card);
+            });
+
+            document.getElementById('stats').textContent = `${words.length} מילים`;
+        }
+
+        function filterWords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let words = currentList === 'all' ? getAllWords() : vocabulary[currentList];
+
+            if (searchTerm) {
+                words = words.filter(w =>
+                    w.en.toLowerCase().includes(searchTerm) ||
+                    w.he.includes(searchTerm)
+                );
+            }
+
+            return words;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startQuiz() {
+            quizWords = shuffleArray([...getAllWords()]);
+            quizIndex = 0;
+            quizScore = 0;
+            quizTotal = 0;
+            document.getElementById('wordsGrid').classList.add('hidden');
+            document.getElementById('quizMode').classList.remove('hidden');
+            document.querySelector('.search-box').classList.add('hidden');
+            document.querySelector('.controls').classList.add('hidden');
+            document.getElementById('stats').classList.add('hidden');
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (quizIndex >= quizWords.length) {
+                quizIndex = 0;
+                quizWords = shuffleArray(quizWords);
+            }
+
+            const word = quizWords[quizIndex];
+            document.getElementById('quizWord').textContent = word.en;
+            document.getElementById('quizScore').textContent = `ניקוד: ${quizScore}/${quizTotal}`;
+
+            speak(word.en);
+
+            // Get wrong answers
+            let wrongAnswers = getAllWords()
+                .filter(w => w.he !== word.he)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3)
+                .map(w => w.he);
+
+            let options = shuffleArray([word.he, ...wrongAnswers]);
+
+            const optionsDiv = document.getElementById('quizOptions');
+            optionsDiv.innerHTML = '';
+
+            options.forEach(option => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option';
+                btn.textContent = option;
+                btn.addEventListener('click', () => checkAnswer(option, word.he));
+                optionsDiv.appendChild(btn);
+            });
+
+            document.getElementById('quizNext').classList.add('hidden');
+        }
+
+        function checkAnswer(selected, correct) {
+            quizTotal++;
+            const options = document.querySelectorAll('.quiz-option');
+
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt.textContent === correct) {
+                    opt.classList.add('correct');
+                } else if (opt.textContent === selected && selected !== correct) {
+                    opt.classList.add('wrong');
+                }
+            });
+
+            if (selected === correct) {
+                quizScore++;
+            }
+
+            document.getElementById('quizScore').textContent = `ניקוד: ${quizScore}/${quizTotal}`;
+            document.getElementById('quizNext').classList.remove('hidden');
+        }
+
+        function exitQuiz() {
+            document.getElementById('wordsGrid').classList.remove('hidden');
+            document.getElementById('quizMode').classList.add('hidden');
+            document.querySelector('.search-box').classList.remove('hidden');
+            document.querySelector('.controls').classList.remove('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            currentList = 'all';
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.list === 'all');
+            });
+            renderWords(getAllWords());
+        }
+
+        // Event listeners
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                if (btn.dataset.list === 'quiz') {
+                    startQuiz();
+                } else {
+                    if (document.getElementById('quizMode').classList.contains('hidden') === false) {
+                        exitQuiz();
+                    }
+                    currentList = btn.dataset.list;
+                    renderWords(filterWords());
+                }
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', () => {
+            renderWords(filterWords());
+        });
+
+        document.getElementById('revealAll').addEventListener('click', () => {
+            document.querySelectorAll('.word-card').forEach(card => {
+                card.classList.add('revealed');
+            });
+        });
+
+        document.getElementById('hideAll').addEventListener('click', () => {
+            document.querySelectorAll('.word-card').forEach(card => {
+                card.classList.remove('revealed');
+            });
+        });
+
+        document.getElementById('shuffle').addEventListener('click', () => {
+            let words = filterWords();
+            renderWords(shuffleArray([...words]));
+        });
+
+        document.getElementById('quizNext').addEventListener('click', () => {
+            quizIndex++;
+            showQuizQuestion();
+        });
+
+        // Initialize
+        renderWords(getAllWords());
+    </script>
+</body>
+</html>
