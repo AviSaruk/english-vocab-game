@@ -561,6 +561,28 @@
             font-size: 1.2em;
         }
 
+        .blacklist-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .blacklist-quiz-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+        }
+
+        .blacklist-quiz-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+        }
+
         @media (max-width: 600px) {
             .words-grid {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -611,14 +633,13 @@
             <p class="instructions">לחצו על מילה כדי לראות את התרגום ולשמוע את ההגייה</p>
 
             <div class="tabs">
-                <button class="tab-btn active" data-list="all">הכל</button>
-                <button class="tab-btn" data-list="LISTA">רשימה A</button>
-                <button class="tab-btn" data-list="LISTB">רשימה B</button>
-                <button class="tab-btn" data-list="LISTC">רשימה C</button>
-                <button class="tab-btn" data-list="LISTD">רשימה D</button>
+                <button class="tab-btn active" data-list="all">כל המילים</button>
                 <button class="tab-btn blacklist-tab" data-list="blacklist">רשימה שחורה</button>
                 <button class="tab-btn" data-list="quiz">מבחן</button>
-                <button class="tab-btn blacklist-tab" data-list="quiz-blacklist">מבחן רשימה שחורה</button>
+            </div>
+
+            <div class="blacklist-header hidden" id="blacklistHeader">
+                <button class="blacklist-quiz-btn" id="blacklistQuizBtn">התחל מבחן על הרשימה השחורה</button>
             </div>
 
             <div class="search-box" id="searchBox">
@@ -1713,9 +1734,18 @@
             const grid = document.getElementById('wordsGrid');
             grid.innerHTML = '';
 
+            // Show/hide blacklist quiz button
+            const blacklistHeader = document.getElementById('blacklistHeader');
+            if (currentList === 'blacklist') {
+                blacklistHeader.classList.remove('hidden');
+            } else {
+                blacklistHeader.classList.add('hidden');
+            }
+
             if (currentList === 'blacklist' && words.length === 0) {
                 grid.innerHTML = '<div class="empty-blacklist">אין מילים ברשימה השחורה! כל הכבוד!</div>';
                 document.getElementById('stats').textContent = '';
+                blacklistHeader.classList.add('hidden');
                 return;
             }
 
@@ -1748,10 +1778,8 @@
 
             if (currentList === 'blacklist') {
                 words = currentUser.blacklist.map(w => ({en: w.en, he: w.he, list: 'blacklist'}));
-            } else if (currentList === 'all') {
-                words = getAllWords();
             } else {
-                words = vocabulary[currentList].map(w => ({...w, list: currentList}));
+                words = getAllWords();
             }
 
             if (searchTerm) {
@@ -2026,8 +2054,6 @@
 
                 if (btn.dataset.list === 'quiz') {
                     startQuiz(false);
-                } else if (btn.dataset.list === 'quiz-blacklist') {
-                    startQuiz(true);
                 } else {
                     if (!document.getElementById('quizMode').classList.contains('hidden')) {
                         exitQuiz();
@@ -2039,6 +2065,10 @@
         });
 
         document.getElementById('quizUnsure').addEventListener('click', markAsUnsure);
+
+        document.getElementById('blacklistQuizBtn').addEventListener('click', () => {
+            startQuiz(true);
+        });
 
         document.getElementById('searchInput').addEventListener('input', () => {
             renderWords(filterWords());
@@ -2062,6 +2092,7 @@
         });
 
         document.getElementById('quizNext').addEventListener('click', () => {
+            document.getElementById('quizUnsure').classList.add('hidden');
             quizIndex++;
             showQuizQuestion();
         });
