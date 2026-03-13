@@ -407,6 +407,45 @@
             background: #764ba2;
         }
 
+        .quiz-unsure {
+            padding: 10px 20px;
+            background: transparent;
+            color: #ff9800;
+            border: 2px solid #ff9800;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .quiz-unsure:hover {
+            background: #ff9800;
+            color: white;
+        }
+
+        .quiz-unsure.added {
+            background: #ff9800;
+            color: white;
+            cursor: default;
+        }
+
+        .quiz-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .mastered-badge {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
         /* History Panel */
         .history-panel {
             background: white;
@@ -579,6 +618,7 @@
                 <button class="tab-btn" data-list="LISTD">רשימה D</button>
                 <button class="tab-btn blacklist-tab" data-list="blacklist">רשימה שחורה</button>
                 <button class="tab-btn" data-list="quiz">מבחן</button>
+                <button class="tab-btn blacklist-tab" data-list="quiz-blacklist">מבחן רשימה שחורה</button>
             </div>
 
             <div class="search-box" id="searchBox">
@@ -599,8 +639,11 @@
                 <div class="quiz-score" id="quizScore">ניקוד: 0/0</div>
                 <div class="quiz-word" id="quizWord"></div>
                 <div class="quiz-options" id="quizOptions"></div>
-                <button class="quiz-next hidden" id="quizNext">המילה הבאה</button>
-                <button class="quiz-next" id="quizExit" style="background: #999; margin-right: 10px;">יציאה מהמבחן</button>
+                <button class="quiz-unsure hidden" id="quizUnsure">לא הייתי בטוח במילה הזאת</button>
+                <div class="quiz-buttons">
+                    <button class="quiz-next hidden" id="quizNext">המילה הבאה</button>
+                    <button class="quiz-next" id="quizExit" style="background: #999;">יציאה מהמבחן</button>
+                </div>
             </div>
 
             <div class="history-panel hidden" id="historyPanel">
@@ -1587,13 +1630,22 @@
             });
         }
 
+        function getMasteredWords() {
+            // Words that user answered correctly and are NOT in blacklist
+            const blacklistWords = new Set(currentUser.blacklist.map(w => w.en));
+            const masteredWords = currentUser.masteredWords || [];
+            return masteredWords.filter(w => !blacklistWords.has(w));
+        }
+
         function updateUserStatsMini() {
             const stats = currentUser.stats;
             const accuracy = stats.totalAnswers > 0
                 ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100)
                 : 0;
-            document.getElementById('userStatsMini').textContent =
-                `מבחנים: ${stats.totalQuizzes} | דיוק: ${accuracy}% | ברשימה שחורה: ${currentUser.blacklist.length}`;
+            const totalWords = getAllWords().length;
+            const mastered = getMasteredWords().length;
+            document.getElementById('userStatsMini').innerHTML =
+                `<span class="mastered-badge">שולט ב-${mastered}/${totalWords} מילים</span> מבחנים: ${stats.totalQuizzes} | דיוק: ${accuracy}% | ברשימה שחורה: ${currentUser.blacklist.length}`;
         }
 
         function addToHistory(action, details) {
@@ -1720,22 +1772,37 @@
             return array;
         }
 
-        function startQuiz() {
-            quizWords = shuffleArray([...getAllWords()]);
+        let quizBlacklistOnly = false;
+
+        function startQuiz(blacklistOnly = false) {
+            quizBlacklistOnly = blacklistOnly;
+
+            if (blacklistOnly) {
+                if (currentUser.blacklist.length === 0) {
+                    alert('אין מילים ברשימה השחורה! לכו ללמוד קודם.');
+                    return;
+                }
+                quizWords = shuffleArray(currentUser.blacklist.map(w => ({en: w.en, he: w.he})));
+            } else {
+                quizWords = shuffleArray([...getAllWords()]);
+            }
+
             quizIndex = 0;
             quizScore = 0;
             quizTotal = 0;
             quizFirstAttempts = {};
+            currentQuizWord = null;
 
             currentUser.stats.totalQuizzes++;
             saveUserData(currentUser);
-            addToHistory('quiz_start', 'התחיל מבחן חדש');
+            addToHistory('quiz_start', blacklistOnly ? 'התחיל מבחן רשימה שחורה' : 'התחיל מבחן חדש');
 
             document.getElementById('wordsGrid').classList.add('hidden');
             document.getElementById('quizMode').classList.remove('hidden');
             document.getElementById('searchBox').classList.add('hidden');
             document.getElementById('controls').classList.add('hidden');
             document.getElementById('stats').classList.add('hidden');
+            document.getElementById('quizUnsure').classList.add('hidden');
             showQuizQuestion();
         }
 
@@ -1773,9 +1840,12 @@
             document.getElementById('quizNext').classList.add('hidden');
         }
 
+        let currentQuizWord = null;
+
         function checkAnswer(selected, word) {
             const correct = word.he;
             const isFirstAttempt = !quizFirstAttempts[word.en];
+            currentQuizWord = word;
 
             if (isFirstAttempt) {
                 quizFirstAttempts[word.en] = true;
@@ -1794,22 +1864,62 @@
                 }
             });
 
+            const unsureBtn = document.getElementById('quizUnsure');
+            unsureBtn.classList.remove('added');
+            unsureBtn.textContent = 'לא הייתי בטוח במילה הזאת';
+
             if (selected === correct) {
                 if (isFirstAttempt) {
                     quizScore++;
                     currentUser.stats.correctAnswers++;
+                    // Add to mastered words
+                    if (!currentUser.masteredWords) {
+                        currentUser.masteredWords = [];
+                    }
+                    // If in blacklist quiz and answered correctly, remove from blacklist
+                    if (quizBlacklistOnly && isBlacklisted(word.en)) {
+                        removeFromBlacklist(word.en);
+                        addToHistory('removed_from_blacklist', `הוסר מהרשימה השחורה: ${word.en}`);
+                    }
+                    if (!currentUser.masteredWords.includes(word.en)) {
+                        currentUser.masteredWords.push(word.en);
+                    }
                 }
+                // Show "not sure" button only on correct answer
+                unsureBtn.classList.remove('hidden');
             } else {
                 if (isFirstAttempt) {
                     addToBlacklist(word);
                     addToHistory('wrong_answer', `טעה במילה: ${word.en} (${word.he})`);
+                    // Remove from mastered if it was there
+                    if (currentUser.masteredWords) {
+                        currentUser.masteredWords = currentUser.masteredWords.filter(w => w !== word.en);
+                    }
                 }
+                unsureBtn.classList.add('hidden');
             }
 
             saveUserData(currentUser);
             updateUserStatsMini();
             document.getElementById('quizScore').textContent = `ניקוד: ${quizScore}/${quizTotal}`;
             document.getElementById('quizNext').classList.remove('hidden');
+        }
+
+        function markAsUnsure() {
+            if (currentQuizWord && !isBlacklisted(currentQuizWord.en)) {
+                addToBlacklist(currentQuizWord);
+                addToHistory('marked_unsure', `סימן כלא בטוח: ${currentQuizWord.en} (${currentQuizWord.he})`);
+                // Remove from mastered
+                if (currentUser.masteredWords) {
+                    currentUser.masteredWords = currentUser.masteredWords.filter(w => w !== currentQuizWord.en);
+                }
+                saveUserData(currentUser);
+                updateUserStatsMini();
+
+                const unsureBtn = document.getElementById('quizUnsure');
+                unsureBtn.classList.add('added');
+                unsureBtn.textContent = 'נוסף לרשימה השחורה';
+            }
         }
 
         function exitQuiz() {
@@ -1839,7 +1949,14 @@
                 ? Math.round((stats.correctAnswers / stats.totalAnswers) * 100)
                 : 0;
 
+            const totalWords = getAllWords().length;
+            const mastered = getMasteredWords().length;
+
             document.getElementById('historyStats').innerHTML = `
+                <div class="stat-card">
+                    <div class="number">${mastered}/${totalWords}</div>
+                    <div class="label">מילים ששולט בהן</div>
+                </div>
                 <div class="stat-card">
                     <div class="number">${stats.totalQuizzes}</div>
                     <div class="label">מבחנים</div>
@@ -1847,10 +1964,6 @@
                 <div class="stat-card">
                     <div class="number">${accuracy}%</div>
                     <div class="label">דיוק</div>
-                </div>
-                <div class="stat-card">
-                    <div class="number">${stats.correctAnswers}</div>
-                    <div class="label">תשובות נכונות</div>
                 </div>
                 <div class="stat-card">
                     <div class="number">${currentUser.blacklist.length}</div>
@@ -1912,7 +2025,9 @@
                 btn.classList.add('active');
 
                 if (btn.dataset.list === 'quiz') {
-                    startQuiz();
+                    startQuiz(false);
+                } else if (btn.dataset.list === 'quiz-blacklist') {
+                    startQuiz(true);
                 } else {
                     if (!document.getElementById('quizMode').classList.contains('hidden')) {
                         exitQuiz();
@@ -1922,6 +2037,8 @@
                 }
             });
         });
+
+        document.getElementById('quizUnsure').addEventListener('click', markAsUnsure);
 
         document.getElementById('searchInput').addEventListener('input', () => {
             renderWords(filterWords());
