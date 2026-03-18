@@ -489,6 +489,77 @@
             margin-top: 15px;
         }
 
+        /* Quiz Selection */
+        .quiz-selection {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .quiz-selection h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+        }
+
+        .quiz-selection-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quiz-selection-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-selection-btn:hover {
+            background: #f0f0ff;
+            transform: translateY(-2px);
+        }
+
+        .quiz-selection-btn.new-words {
+            border-color: #38ef7d;
+        }
+
+        .quiz-selection-btn.new-words:hover {
+            background: #e8fff0;
+        }
+
+        .quiz-selection-btn.blacklist {
+            border-color: #ff6b6b;
+        }
+
+        .quiz-selection-btn.blacklist:hover {
+            background: #fff0f0;
+        }
+
+        .quiz-btn-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .quiz-btn-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .quiz-btn-desc {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
         .mastered-badge {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
             color: white;
@@ -712,6 +783,28 @@
             <div class="stats" id="stats"></div>
 
             <div class="words-grid" id="wordsGrid"></div>
+
+            <div class="quiz-selection hidden" id="quizSelection">
+                <h2>בחר סוג מבחן</h2>
+                <div class="quiz-selection-options">
+                    <button class="quiz-selection-btn" id="quizAllWords">
+                        <span class="quiz-btn-icon">📚</span>
+                        <span class="quiz-btn-title">כל המילים</span>
+                        <span class="quiz-btn-desc">מבחן על כל המילים ברשימה</span>
+                    </button>
+                    <button class="quiz-selection-btn new-words" id="quizNewWords">
+                        <span class="quiz-btn-icon">✨</span>
+                        <span class="quiz-btn-title">רק מילים חדשות</span>
+                        <span class="quiz-btn-desc">מילים שעדיין לא נבחנת עליהן</span>
+                    </button>
+                    <button class="quiz-selection-btn blacklist" id="quizBlacklist">
+                        <span class="quiz-btn-icon">🔴</span>
+                        <span class="quiz-btn-title">רשימה שחורה</span>
+                        <span class="quiz-btn-desc">מילים שצריך לחזק</span>
+                    </button>
+                </div>
+                <button class="control-btn" id="quizSelectionBack" style="margin-top: 20px;">חזרה</button>
+            </div>
 
             <div class="quiz-mode hidden" id="quizMode">
                 <div class="quiz-score" id="quizScore">ניקוד: 0/0</div>
@@ -1916,17 +2009,30 @@
         }
 
         let quizBlacklistOnly = false;
+        let quizType = 'all'; // 'all', 'blacklist', 'new'
 
-        function startQuiz(blacklistOnly = false) {
-            quizBlacklistOnly = blacklistOnly;
+        function startQuiz(type = 'all') {
+            quizType = type;
+            quizBlacklistOnly = (type === 'blacklist');
             const modeData = getModeData();
 
-            if (blacklistOnly) {
+            if (type === 'blacklist') {
                 if (modeData.blacklist.length === 0) {
                     alert('אין מילים ברשימה השחורה! לכו ללמוד קודם.');
                     return;
                 }
                 quizWords = shuffleArray(modeData.blacklist.map(w => ({en: w.en, he: w.he})));
+            } else if (type === 'new') {
+                // Get words that are not in blacklist and not mastered
+                const blacklistSet = new Set(modeData.blacklist.map(w => w.en));
+                const masteredSet = new Set(modeData.masteredWords || []);
+                const newWords = getAllWords().filter(w => !blacklistSet.has(w.en) && !masteredSet.has(w.en));
+
+                if (newWords.length === 0) {
+                    alert('אין מילים חדשות! כל המילים כבר ברשימה השחורה או שאתה שולט בהן.');
+                    return;
+                }
+                quizWords = shuffleArray(newWords);
             } else {
                 quizWords = shuffleArray([...getAllWords()]);
             }
@@ -1939,10 +2045,15 @@
 
             modeData.stats.totalQuizzes++;
             saveUserData(currentUser);
-            addToHistory('quiz_start', blacklistOnly ? 'התחיל מבחן רשימה שחורה' : 'התחיל מבחן חדש');
+
+            let historyMsg = 'התחיל מבחן חדש';
+            if (type === 'blacklist') historyMsg = 'התחיל מבחן רשימה שחורה';
+            else if (type === 'new') historyMsg = 'התחיל מבחן מילים חדשות';
+            addToHistory('quiz_start', historyMsg);
 
             document.getElementById('wordsGrid').classList.add('hidden');
             document.getElementById('quizMode').classList.remove('hidden');
+            document.getElementById('quizSelection').classList.add('hidden');
             document.getElementById('searchBox').classList.add('hidden');
             document.getElementById('controls').classList.add('hidden');
             document.getElementById('stats').classList.add('hidden');
@@ -2114,6 +2225,7 @@
 
             document.getElementById('wordsGrid').classList.remove('hidden');
             document.getElementById('quizMode').classList.add('hidden');
+            document.getElementById('quizSelection').classList.add('hidden');
             document.getElementById('searchBox').classList.remove('hidden');
             document.getElementById('controls').classList.remove('hidden');
             document.getElementById('stats').classList.remove('hidden');
@@ -2218,11 +2330,18 @@
                 btn.classList.add('active');
 
                 if (btn.dataset.list === 'quiz') {
-                    startQuiz(false);
+                    // Show quiz selection modal
+                    document.getElementById('wordsGrid').classList.add('hidden');
+                    document.getElementById('searchBox').classList.add('hidden');
+                    document.getElementById('controls').classList.add('hidden');
+                    document.getElementById('stats').classList.add('hidden');
+                    document.getElementById('blacklistHeader').classList.add('hidden');
+                    document.getElementById('quizSelection').classList.remove('hidden');
                 } else {
                     if (!document.getElementById('quizMode').classList.contains('hidden')) {
                         exitQuiz();
                     }
+                    document.getElementById('quizSelection').classList.add('hidden');
                     currentList = btn.dataset.list;
                     renderWords(filterWords());
                 }
@@ -2232,7 +2351,28 @@
         document.getElementById('quizUnsure').addEventListener('click', markAsUnsure);
 
         document.getElementById('blacklistQuizBtn').addEventListener('click', () => {
-            startQuiz(true);
+            startQuiz('blacklist');
+        });
+
+        // Quiz selection buttons
+        document.getElementById('quizAllWords').addEventListener('click', () => {
+            startQuiz('all');
+        });
+
+        document.getElementById('quizNewWords').addEventListener('click', () => {
+            startQuiz('new');
+        });
+
+        document.getElementById('quizBlacklist').addEventListener('click', () => {
+            startQuiz('blacklist');
+        });
+
+        document.getElementById('quizSelectionBack').addEventListener('click', () => {
+            document.getElementById('quizSelection').classList.add('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.tab-btn[data-list="all"]').classList.add('active');
+            currentList = 'all';
+            renderWords(filterWords());
         });
 
         document.getElementById('searchInput').addEventListener('input', () => {
